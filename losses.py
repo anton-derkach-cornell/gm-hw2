@@ -13,7 +13,7 @@ def gaussian_elbo(x1,x2,z,sigma,mu,logvar):
 
     # return reconstruction, divergence
 
-    reconstruction = (1./(2*sigma**2))(x1 - x2).pow(2).view(x1.shape[0],-1).sum(1).mean()
+    reconstruction = (1./(2.0*sigma**2))*(x1 - x2).pow(2).view(x1.shape[0],-1).sum(1).mean()
     divergence = .5*(logvar.exp() + mu.pow(2) - 1 - logvar).sum(1).mean()
     return reconstruction, divergence
 
