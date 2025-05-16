@@ -8,9 +8,13 @@ def gaussian_elbo(x1,x2,z,sigma,mu,logvar):
     #             Use the closed-form expression for the KL divergence from Problem 1.
     #
 
-    reconstruction = (1 / (2 * sigma**2)) * torch.sum((x2 - x1)**2)
-    divergence = 0.5 * torch.sum(torch.exp(logvar) + mu**2 - 1 - logvar)
+    # reconstruction = (1 / (2 * sigma**2)) * torch.sum((x2 - x1)**2)
+    # divergence = 0.5 * torch.sum(torch.exp(logvar) + mu**2 - 1 - logvar)
 
+    # return reconstruction, divergence
+
+    reconstruction = (1./(2*sigma**2))(x1 - x2).pow(2).view(x1.shape[0],-1).sum(1).mean()
+    divergence = .5*(logvar.exp() + mu.pow(2) - 1 - logvar).sum(1).mean()
     return reconstruction, divergence
 
 def mc_gaussian_elbo(x1,x2,z,sigma,mu,logvar):
@@ -20,13 +24,19 @@ def mc_gaussian_elbo(x1,x2,z,sigma,mu,logvar):
     #             Use a (1-point) monte-carlo estimate of the KL divergence.
     #
 
-    reconstruction = (1 / (2 * sigma**2)) * torch.sum((x2 - x1)**2)
+    # reconstruction = (1 / (2 * sigma**2)) * torch.sum((x2 - x1)**2)
     
-    log_q = -0.5 * (torch.sum(logvar, dim=1) + torch.sum((z - mu)**2 / torch.exp(logvar), dim=1))
-    log_r = -0.5 * torch.sum(z**2, dim=1)
+    # log_q = -0.5 * (torch.sum(logvar, dim=1) + torch.sum((z - mu)**2 / torch.exp(logvar), dim=1))
+    # log_r = -0.5 * torch.sum(z**2, dim=1)
     
-    divergence = torch.sum(log_q - log_r)
+    # divergence = torch.sum(log_q - log_r)
 
+    # return reconstruction, divergence
+
+    reconstruction = (1./sigma*2)*(x1 - x2).pow(2).view(x1.shape[0],-1).mean()
+    logpz = 0.5 * z.pow(2).sum(1)
+    logqzx = 0.5 * (logvar + torch.pow((z-mu),2)/logvar.exp()).sum(1)
+    divergence = (logpz - logqzx).mean()
     return reconstruction, divergence
 
 def cross_entropy(x1,x2):
